@@ -14,10 +14,11 @@ import {
   FetchError,
 } from "@inrupt/solid-client";
 import { session } from "./session";
+import { isBrokered, brokerFetch } from "./broker";
 
 /**
  * Pod I/O for the photo gallery. The pod is the ONLY store — every call here
- * goes through the OIDC session's authenticated fetch. Solid gotchas honored:
+ * goes through the authenticated fetch. Solid gotchas honored:
  *
  *   - `saveFileInContainer`'s slug is advisory: the server picks the final
  *     URL, so we ALWAYS read it back via `getSourceUrl(result)`.
@@ -40,8 +41,14 @@ export type Photo = {
 const RDF_TYPE = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const IANA_PREFIX = "http://www.w3.org/ns/iana/media-types/";
 
+/**
+ * The fetch every pod call runs through. When Photos is hosted in the Mind
+ * shell (brokered mode) this is the shell's scope-checked broker fetch —
+ * Photos holds no session of its own; otherwise it's the local OIDC session's
+ * authed fetch.
+ */
 function authedFetch(): typeof fetch {
-  return session().fetch as typeof fetch;
+  return isBrokered() ? brokerFetch : (session().fetch as typeof fetch);
 }
 
 /**

@@ -6,8 +6,10 @@ import { fetchImageBlob } from "@/lib/solid/photos";
 /**
  * Pod images need an authenticated fetch — `<img src={podUrl}>` would 401
  * because the browser sends no DPoP token. This hook fetches the blob with
- * the session's fetch (via `getFile`), exposes it as an object URL, and
- * revokes the object URL on cleanup / url change so blobs don't leak.
+ * the active authed fetch (via `getFile` → photos.ts, which is the shell's
+ * broker fetch when embedded, else the session's fetch), exposes it as an
+ * object URL, and revokes the object URL on cleanup / url change so blobs
+ * don't leak.
  */
 export function useAuthedImage(url: string | null): {
   src: string | null;

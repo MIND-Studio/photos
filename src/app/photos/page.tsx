@@ -8,7 +8,12 @@ import {
   ensureSession,
   rememberSignedOutPath,
 } from "@/lib/solid/auth";
-import { podRootFromWebId, photosContainerFor } from "@/lib/config";
+import { photosContainerFor } from "@/lib/config";
+import {
+  currentIdentity,
+  isBrokered,
+  signalReady,
+} from "@/lib/solid/broker";
 import {
   listPhotos,
   uploadPhoto,
@@ -36,13 +41,17 @@ export default function PhotosPage() {
 
   useEffect(() => {
     ensureSession()
-      .then((info) => {
-        if (!info.isLoggedIn || !info.webId) {
+      .then(() => {
+        // Identity is brokered-first: inside the Mind shell it's the shell's
+        // webId + workspace pod root (no local session); standalone it's the
+        // OIDC session.
+        const id = currentIdentity();
+        if (!id) {
           rememberSignedOutPath();
           setContainer("");
           return;
         }
-        setContainer(photosContainerFor(podRootFromWebId(info.webId)));
+        setContainer(photosContainerFor(id.podRoot));
       })
       .catch((e) => {
         setContainer("");
@@ -62,7 +71,12 @@ export default function PhotosPage() {
   }, []);
 
   useEffect(() => {
-    if (container) void refresh(container);
+    if (!container) return;
+    void refresh(container).then(() => {
+      // Tell the shell we've rendered so it drops its loading overlay (no-op
+      // when standalone).
+      if (isBrokered()) signalReady();
+    });
   }, [container, refresh]);
 
   function pickFiles() {
