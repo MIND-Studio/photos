@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Button } from "@mind-studio/ui";
 import { LogOut } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import ThemeToggle from "@/components/ThemeToggle";
 import { ensureSession } from "@/lib/solid/auth";
 import { session } from "@/lib/solid/session";
-import ThemeToggle from "@/components/ThemeToggle";
 
 /**
  * App masthead: name + tagline, theme toggle, and (when signed in) an
@@ -48,9 +48,7 @@ export default function Header() {
     <header className="border-b bg-card">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-10 sm:py-4">
         <Link href="/" className="flex items-baseline gap-3">
-          <span className="text-xl font-semibold tracking-tight sm:text-2xl">
-            Mind Photos
-          </span>
+          <span className="text-xl font-semibold tracking-tight sm:text-2xl">Mind Photos</span>
           <span className="hidden text-[10px] uppercase tracking-[0.22em] text-muted-foreground sm:inline">
             <span className="text-primary">●</span> photos in your pod
           </span>
@@ -66,12 +64,7 @@ export default function Header() {
               >
                 {host}
               </span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onSignOut}
-                aria-label="Sign out"
-              >
+              <Button variant="ghost" size="sm" onClick={onSignOut} aria-label="Sign out">
                 <LogOut className="size-4" />
                 <span className="hidden sm:inline">Sign out</span>
               </Button>
