@@ -16,6 +16,15 @@
  * there is no bespoke palette.
  */
 
+/* Bind the Mind design-system font tokens to the fleet webfonts loaded via
+   next/font in layout.tsx (--font-fraunces / --font-hanken / --font-jb). The
+   @mind-studio/ui components read these --mind-font-* tokens. */
+:root {
+  --mind-font-sans: var(--font-hanken), ui-sans-serif, system-ui, sans-serif;
+  --mind-font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --mind-font-mono: var(--font-jb), ui-monospace, SFMono-Regular, monospace;
+}
+
 html,
 body {
   background: var(--background);
