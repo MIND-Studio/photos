@@ -1,27 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { Button, Skeleton, Spinner } from "@mind-studio/ui";
 import { ImagePlus, Upload, X } from "lucide-react";
-import {
-  ensureSession,
-  rememberSignedOutPath,
-} from "@/lib/solid/auth";
-import { photosContainerFor } from "@/lib/config";
-import {
-  currentIdentity,
-  isBrokered,
-  signalReady,
-} from "@/lib/solid/broker";
-import {
-  listPhotos,
-  uploadPhoto,
-  deletePhoto,
-  type Photo,
-} from "@/lib/solid/photos";
-import PhotoTile from "@/components/PhotoTile";
+import Link from "next/link";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Lightbox from "@/components/Lightbox";
+import PhotoTile from "@/components/PhotoTile";
+import { photosContainerFor } from "@/lib/config";
+import { ensureSession, rememberSignedOutPath } from "@/lib/solid/auth";
+import { currentIdentity, isBrokered, signalReady } from "@/lib/solid/broker";
+import { deletePhoto, listPhotos, type Photo, uploadPhoto } from "@/lib/solid/photos";
 
 type UploadState = {
   id: string;
@@ -98,12 +86,10 @@ export default function PhotosPage() {
           setPhotos((prev) => [photo, ...(prev ?? [])]);
         } catch (e) {
           setUploads((u) =>
-            u.map((x) =>
-              x.id === id ? { ...x, status: "error", message: String(e) } : x
-            )
+            u.map((x) => (x.id === id ? { ...x, status: "error", message: String(e) } : x)),
           );
         }
-      })
+      }),
     );
   }
 
@@ -114,11 +100,7 @@ export default function PhotosPage() {
     const next = prev.filter((p) => p.url !== photo.url);
     setPhotos(next);
     // Advance the lightbox to a neighbor, or close it on the last photo.
-    setLightboxUrl(
-      next.length
-        ? next[Math.min(Math.max(idx, 0), next.length - 1)].url
-        : null
-    );
+    setLightboxUrl(next.length ? next[Math.min(Math.max(idx, 0), next.length - 1)].url : null);
   }
 
   // ----- signed-out / loading shells -------------------------------------
@@ -149,12 +131,8 @@ export default function PhotosPage() {
 
   // ----- main surface ------------------------------------------------------
 
-  const lightboxIndex =
-    photos && lightboxUrl
-      ? photos.findIndex((p) => p.url === lightboxUrl)
-      : -1;
-  const lightboxPhoto =
-    photos && lightboxIndex >= 0 ? photos[lightboxIndex] : null;
+  const lightboxIndex = photos && lightboxUrl ? photos.findIndex((p) => p.url === lightboxUrl) : -1;
+  const lightboxPhoto = photos && lightboxIndex >= 0 ? photos[lightboxIndex] : null;
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-8 sm:px-10">
@@ -205,26 +183,19 @@ export default function PhotosPage() {
               ) : (
                 <X className="size-4 shrink-0" />
               )}
-              <span className="min-w-0 truncate font-mono text-xs">
-                {u.name}
-              </span>
+              <span className="min-w-0 truncate font-mono text-xs">{u.name}</span>
               <span className="ml-auto shrink-0">
                 {u.status === "uploading" ? (
                   "Uploading…"
                 ) : (
                   <span className="flex items-center gap-2">
-                    <span
-                      className="max-w-[16rem] truncate"
-                      title={u.message}
-                    >
+                    <span className="max-w-[16rem] truncate" title={u.message}>
                       {u.message ?? "Upload failed"}
                     </span>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() =>
-                        setUploads((all) => all.filter((x) => x.id !== u.id))
-                      }
+                      onClick={() => setUploads((all) => all.filter((x) => x.id !== u.id))}
                     >
                       Dismiss
                     </Button>
@@ -244,11 +215,7 @@ export default function PhotosPage() {
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {photos.map((photo) => (
-              <PhotoTile
-                key={photo.url}
-                photo={photo}
-                onOpen={() => setLightboxUrl(photo.url)}
-              />
+              <PhotoTile key={photo.url} photo={photo} onOpen={() => setLightboxUrl(photo.url)} />
             ))}
           </div>
         )}
@@ -290,13 +257,10 @@ function EmptyState({ onPick }: { onPick: () => void }) {
       <span className="flex size-16 items-center justify-center rounded-full bg-primary/10 text-primary">
         <ImagePlus className="size-8" />
       </span>
-      <span className="text-lg font-semibold tracking-tight">
-        No photos yet
-      </span>
+      <span className="text-lg font-semibold tracking-tight">No photos yet</span>
       <span className="max-w-sm text-sm text-muted-foreground">
         Click to upload your first pictures. They go straight into{" "}
-        <span className="font-mono">apps/photos/</span> in your pod — nowhere
-        else.
+        <span className="font-mono">apps/photos/</span> in your pod — nowhere else.
       </span>
     </button>
   );

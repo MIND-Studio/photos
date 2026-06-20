@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,6 +13,7 @@ import {
   Spinner,
 } from "@mind-studio/ui";
 import { ChevronLeft, ChevronRight, ImageOff, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useAuthedImage } from "@/hooks/useAuthedImage";
 import type { Photo } from "@/lib/solid/photos";
 
@@ -78,9 +78,7 @@ export default function Lightbox({
     >
       {/* Top bar: filename + actions */}
       <div className="flex items-center justify-between gap-4 px-4 py-3">
-        <p className="min-w-0 truncate font-mono text-sm text-white/90">
-          {photo.name}
-        </p>
+        <p className="min-w-0 truncate font-mono text-sm text-white/90">{photo.name}</p>
         <div className="flex shrink-0 items-center gap-1">
           <Button
             variant="ghost"
@@ -159,8 +157,8 @@ export default function Lightbox({
           <AlertDialogHeader>
             <AlertDialogTitle>Delete this photo?</AlertDialogTitle>
             <AlertDialogDescription className="break-all">
-              <span className="font-mono">{photo.name}</span> will be
-              permanently removed from your pod. This cannot be undone.
+              <span className="font-mono">{photo.name}</span> will be permanently removed from your
+              pod. This cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           {deleteError && (

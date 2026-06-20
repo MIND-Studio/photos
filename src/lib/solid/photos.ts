@@ -1,20 +1,20 @@
 "use client";
 
 import {
-  getSolidDataset,
+  createContainerAt,
+  deleteFile,
+  FetchError,
   getContainedResourceUrlAll,
-  getThing,
-  getUrlAll,
   getDatetime,
   getFile,
-  deleteFile,
-  saveFileInContainer,
-  createContainerAt,
+  getSolidDataset,
   getSourceUrl,
-  FetchError,
+  getThing,
+  getUrlAll,
+  saveFileInContainer,
 } from "@inrupt/solid-client";
+import { brokerFetch, isBrokered } from "./broker";
 import { session } from "./session";
-import { isBrokered, brokerFetch } from "./broker";
 
 /**
  * Pod I/O for the photo gallery. The pod is the ONLY store — every call here
@@ -114,19 +114,15 @@ export async function listPhotos(containerUrl: string): Promise<Photo[]> {
     const thing = getThing(dataset, url);
     let contentType: string | null = null;
     if (thing) {
-      const ianaType = getUrlAll(thing, RDF_TYPE).find((t) =>
-        t.startsWith(IANA_PREFIX)
-      );
+      const ianaType = getUrlAll(thing, RDF_TYPE).find((t) => t.startsWith(IANA_PREFIX));
       if (ianaType) {
-        contentType = ianaType
-          .slice(IANA_PREFIX.length)
-          .replace(/#Resource$/, "");
+        contentType = ianaType.slice(IANA_PREFIX.length).replace(/#Resource$/, "");
       }
     }
     if (!contentType) contentType = guessImageContentType(url);
     if (!contentType || !contentType.startsWith("image/")) continue;
     const modified = thing
-      ? getDatetime(thing, "http://purl.org/dc/terms/modified") ?? undefined
+      ? (getDatetime(thing, "http://purl.org/dc/terms/modified") ?? undefined)
       : undefined;
     photos.push({ url, name: decodedBasename(url), contentType, modified });
   }
@@ -152,14 +148,11 @@ async function ensureContainer(containerUrl: string): Promise<void> {
  * Upload one image file into the container. Returns the Photo with the
  * server-assigned URL (the slug is advisory — never assume it was honored).
  */
-export async function uploadPhoto(
-  containerUrl: string,
-  file: File
-): Promise<Photo> {
+export async function uploadPhoto(containerUrl: string, file: File): Promise<Photo> {
   const contentType =
     file.type && file.type.startsWith("image/")
       ? file.type
-      : guessImageContentType(file.name) ?? "application/octet-stream";
+      : (guessImageContentType(file.name) ?? "application/octet-stream");
   if (!contentType.startsWith("image/")) {
     throw new Error(`Not an image: ${file.name}`);
   }
